@@ -1,0 +1,9 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "local>TheFrenchGhosty/docker-openchamber-quay//.github/renovate/ci.json",
+    "local>TheFrenchGhosty/docker-openchamber-quay//.github/renovate/docker.json",
+    "local>TheFrenchGhosty/docker-openchamber-quay//.github/renovate/compose.json"
+  ]
+}

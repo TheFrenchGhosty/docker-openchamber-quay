@@ -1,0 +1,17 @@
+services:
+  openchamber:
+    image: quay.io/thefrenchghosty/openchamber:latest
+    container_name: openchamber
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3000:3000" # Replace with "3000:3000" if you don't use a reverse proxy
+    environment:
+      # Required: the container binds 0.0.0.0, so UI authentication is enforced
+      - OPENCHAMBER_UI_PASSWORD=CHANGE_ME
+    volumes:
+      - ./data/openchamber:/home/openchamber/.config/openchamber
+      - ./data/opencode/share:/home/openchamber/.local/share/opencode
+      - ./data/opencode/state:/home/openchamber/.local/state/opencode
+      - ./data/opencode/config:/home/openchamber/.config/opencode
+      - ./data/ssh:/home/openchamber/.ssh
+      - ./workspaces:/home/openchamber/workspaces
