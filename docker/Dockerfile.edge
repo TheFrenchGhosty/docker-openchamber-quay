@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 # OpenChamber - latest source build from upstream main, variant tag :edge
 
 FROM oven/bun:1.3.14 AS builder
@@ -16,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 FROM oven/bun:1.3.14
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash ca-certificates git nodejs npm openssh-client tini && \
+    bash ca-certificates git nodejs npm openssh-client && \
     rm -rf /var/lib/apt/lists/* && \
     userdel bun && \
     groupadd -g 1000 openchamber && \
@@ -39,8 +37,7 @@ COPY --from=builder /app/packages/web/package.json ./packages/web/package.json
 COPY --from=builder /app/packages/web/bin ./packages/web/bin
 COPY --from=builder /app/packages/web/server ./packages/web/server
 COPY --from=builder /app/packages/web/dist ./packages/web/dist
+COPY --from=builder /app/scripts/docker-entrypoint.sh /home/openchamber/openchamber-entrypoint.sh
 
 EXPOSE 3000
-ENTRYPOINT ["/usr/bin/tini", "--"]
-# the CLI daemonizes and returns; `logs` keeps the container alive
-CMD ["sh", "-c", "bun packages/web/bin/cli.js && bun packages/web/bin/cli.js logs"]
+ENTRYPOINT ["sh", "/home/openchamber/openchamber-entrypoint.sh"]

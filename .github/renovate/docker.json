@@ -7,5 +7,17 @@
       "groupName": "Docker images",
       "separateMajorMinor": false
     }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Bump the pinned openchamber release ref used to fetch docker-entrypoint.sh",
+      "fileMatch": ["^docker/Dockerfile\\.release$"],
+      "matchStrings": [
+        "# renovate: datasource=github-releases depName=openchamber/openchamber\\s*ARG OPENCHAMBER_REF=(?<currentValue>.+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "openchamber/openchamber"
+    }
   ]
 }

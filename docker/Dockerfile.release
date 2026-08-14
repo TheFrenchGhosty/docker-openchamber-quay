@@ -3,7 +3,7 @@
 FROM oven/bun:1.3.14
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash ca-certificates git nodejs npm openssh-client tini && \
+    bash ca-certificates git nodejs npm openssh-client && \
     rm -rf /var/lib/apt/lists/* && \
     userdel bun && \
     groupadd -g 1000 openchamber && \
@@ -19,7 +19,12 @@ ENV OPENCHAMBER_HOST=0.0.0.0
 
 RUN npm install -g @openchamber/web opencode-ai
 
+# renovate: datasource=github-releases depName=openchamber/openchamber
+ARG OPENCHAMBER_REF=v1.18.3
+ADD --chmod=0644 https://raw.githubusercontent.com/openchamber/openchamber/${OPENCHAMBER_REF}/scripts/docker-entrypoint.sh /home/openchamber/openchamber-entrypoint.sh
+# Shim the source-tree layout the upstream entrypoint expects (packages/web/bin/cli.js)
+# onto the npm-global package install
+RUN mkdir -p packages && ln -s "$(npm root -g)/@openchamber/web" packages/web
+
 EXPOSE 3000
-ENTRYPOINT ["/usr/bin/tini", "--"]
-# `openchamber` daemonizes and returns; `openchamber logs` keeps the container alive
-CMD ["sh", "-c", "openchamber && openchamber logs"]
+ENTRYPOINT ["sh", "/home/openchamber/openchamber-entrypoint.sh"]
