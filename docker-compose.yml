@@ -6,8 +6,22 @@ services:
     ports:
       - "127.0.0.1:3000:3000" # Replace with "3000:3000" if you don't use a reverse proxy
     environment:
-      # Required: the container binds 0.0.0.0, so UI authentication is enforced
+      # Required: the container binds 0.0.0.0, so UI authentication is required
       - OPENCHAMBER_UI_PASSWORD=CHANGE_ME
+      - OH_MY_OPENCODE=false # disable oh-my-opencode by default
+      -
+      # - OPENCHAMBER_HOST=0.0.0.0  # Bind address (default in Docker entrypoint: 0.0.0.0)
+
+      # - OPENCODE_HOST=http://172.17.0.1:4096 # Connect to external OpenCode server
+      # - OPENCODE_SKIP_START=true # don't start the internal opencode (for external OpenCode server)
+      # - OPENCHAMBER_OPENCODE_HOSTNAME=0.0.0.0 # Bind the internal OpenCode to all interfaces (if you want to expose it)
+
+      # - OPENCHAMBER_TUNNEL_PROVIDER=cloudflare # disabled by default: no connection to cloudflare is made unless you explicitly set it up
+      # - OPENCHAMBER_TUNNEL_MODE=quick  # quick | managed-remote | managed-local
+      # - OPENCHAMBER_TUNNEL_HOSTNAME=app.example.com  # required for managed-remote
+      # - OPENCHAMBER_TUNNEL_TOKEN=your_cloudflare_token  # required for managed-remote
+      # - OPENCHAMBER_TUNNEL_CONFIG=/home/openchamber/.cloudflared/config.yml  # optional for managed-local
+
     volumes:
       - ./data/openchamber:/home/openchamber/.config/openchamber
       - ./data/opencode/share:/home/openchamber/.local/share/opencode
