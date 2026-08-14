@@ -19,6 +19,31 @@ ENV OPENCHAMBER_HOST=0.0.0.0
 
 RUN npm install -g @openchamber/web opencode-ai
 
+# Upstream writeSettingsToDisk chmods the settings dir/file on every save; the
+# chmod fails with EPERM on some bind-mounted volumes, spamming errors on every
+# PUT /api/config/settings. Neutralize those three chmods (keeps the win32
+# error-handling check on the line above intact). Fails the build if upstream
+# changes the pattern, so the patch never silently stops applying.
+#
+# Example of the error this prevents:
+#
+#   503 |   const writeSettingsToDisk = async (settings) => {
+#   504 |     try {
+#   505 |       const settingsDirectory = path.dirname(SETTINGS_FILE_PATH);
+#   506 |       await fsPromises.mkdir(settingsDirectory, { recursive: true, mode: 0o700 });
+#   507 |       if (process.platform !== 'win32') await fsPromises.chmod(settingsDirectory, 0o700);
+#       |                                                              ^
+#   EPERM: operation not permitted, chmod '/home/openchamber/.config/openchamber'
+#       path: "/home/openchamber/.config/openchamber",
+#       syscall: "chmod",
+#       errno: -1,
+#       code: "EPERM"
+#     at .../@openchamber/web/server/lib/opencode/settings-runtime.js:507:58
+#   [API:PUT /api/config/settings] Failed to save settings: Error: EPERM: operation not permitted, chmod '/home/openchamber/.config/openchamber'
+RUN SETTINGS_RUNTIME="$(npm root -g)/@openchamber/web/server/lib/opencode/settings-runtime.js" && \
+    sed -i "s/if (process\.platform !== 'win32') await fsPromises\.chmod/if (false) await fsPromises.chmod/g" "$SETTINGS_RUNTIME" && \
+    test "$(grep -c 'if (false) await fsPromises.chmod' "$SETTINGS_RUNTIME")" -eq 3
+
 # renovate: datasource=github-releases depName=openchamber/openchamber
 ARG OPENCHAMBER_REF=v1.18.3
 ADD --chmod=0644 https://raw.githubusercontent.com/openchamber/openchamber/${OPENCHAMBER_REF}/scripts/docker-entrypoint.sh /home/openchamber/openchamber-entrypoint.sh
