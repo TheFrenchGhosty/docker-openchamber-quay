@@ -1,6 +1,6 @@
 # OpenChamber - latest release (npm @openchamber/web), variant tag :latest
 
-FROM oven/bun:1.3.14
+FROM oven/bun:1.4.0
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates git nodejs npm openssh-client && \
