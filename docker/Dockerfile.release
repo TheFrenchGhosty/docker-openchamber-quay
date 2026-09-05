@@ -45,7 +45,7 @@ RUN SETTINGS_RUNTIME="$(npm root -g)/@openchamber/web/server/lib/opencode/settin
     test "$(grep -c 'if (false) await fsPromises.chmod' "$SETTINGS_RUNTIME")" -eq 3
 
 # renovate: datasource=github-releases depName=openchamber/openchamber
-ARG OPENCHAMBER_REF=v1.22.0
+ARG OPENCHAMBER_REF=v1.22.1
 ADD --chmod=0644 https://raw.githubusercontent.com/openchamber/openchamber/${OPENCHAMBER_REF}/scripts/docker-entrypoint.sh /home/openchamber/openchamber-entrypoint.sh
 # Shim the source-tree layout the upstream entrypoint expects (packages/web/bin/cli.js)
 # onto the npm-global package install
