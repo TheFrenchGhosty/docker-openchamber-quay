@@ -1,6 +1,6 @@
 # OpenChamber - latest source build from upstream main, variant tag :edge
 
-FROM oven/bun:1.3.14 AS builder
+FROM oven/bun:1.4.2 AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -18,7 +18,7 @@ RUN SETTINGS_RUNTIME=packages/web/server/lib/opencode/settings-runtime.js && \
     test "$(grep -c 'if (false) await fsPromises.chmod' "$SETTINGS_RUNTIME")" -eq 3
 
 
-FROM oven/bun:1.3.14
+FROM oven/bun:1.4.2
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates git nodejs npm openssh-client && \
