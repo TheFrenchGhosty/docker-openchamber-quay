@@ -23,7 +23,9 @@ RUN npm install -g @openchamber/web opencode-ai
 # chmod fails with EPERM on some bind-mounted volumes, spamming errors on every
 # PUT /api/config/settings. Neutralize those three chmods (keeps the win32
 # error-handling check on the line above intact). Fails the build if upstream
-# changes the pattern, so the patch never silently stops applying.
+# changes the pattern, so the patch never silently stops applying. The sed
+# matches the guard with or without an extra condition (e.g. `created &&`)
+# before `process.platform !== 'win32'`.
 #
 # Example of the error this prevents:
 #
@@ -41,8 +43,8 @@ RUN npm install -g @openchamber/web opencode-ai
 #     at .../@openchamber/web/server/lib/opencode/settings-runtime.js:507:58
 #   [API:PUT /api/config/settings] Failed to save settings: Error: EPERM: operation not permitted, chmod '/home/openchamber/.config/openchamber'
 RUN SETTINGS_RUNTIME="$(npm root -g)/@openchamber/web/server/lib/opencode/settings-runtime.js" && \
-    sed -i "s/if (process\.platform !== 'win32') await fsPromises\.chmod/if (false) await fsPromises.chmod/g" "$SETTINGS_RUNTIME" && \
-    test "$(grep -c 'if (false) await fsPromises.chmod' "$SETTINGS_RUNTIME")" -eq 3
+    sed -i -E "s/if \([^)]*process\.platform !== 'win32'\) await fsPromises\.chmod/if (false) await fsPromises.chmod/g" "$SETTINGS_RUNTIME" && \
+    test "$(grep -c 'if (false) await fsPromises\.chmod' "$SETTINGS_RUNTIME")" -eq 3
 
 # renovate: datasource=github-releases depName=openchamber/openchamber
 ARG OPENCHAMBER_REF=v2.7.2

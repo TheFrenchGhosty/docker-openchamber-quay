@@ -12,10 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Same chmod-EPERM patch as Dockerfile.release: disable the three
 # writeSettingsToDisk chmods in settings-runtime.js (build fails if the
-# upstream pattern changes).
+# upstream pattern changes). The sed matches the guard with or without an
+# extra condition (e.g. `created &&`) before `process.platform !== 'win32'`.
 RUN SETTINGS_RUNTIME=packages/web/server/lib/opencode/settings-runtime.js && \
-    sed -i "s/if (process\.platform !== 'win32') await fsPromises\.chmod/if (false) await fsPromises.chmod/g" "$SETTINGS_RUNTIME" && \
-    test "$(grep -c 'if (false) await fsPromises.chmod' "$SETTINGS_RUNTIME")" -eq 3
+    sed -i -E "s/if \([^)]*process\.platform !== 'win32'\) await fsPromises\.chmod/if (false) await fsPromises.chmod/g" "$SETTINGS_RUNTIME" && \
+    test "$(grep -c 'if (false) await fsPromises\.chmod' "$SETTINGS_RUNTIME")" -eq 3
 
 
 FROM oven/bun:1.4.4
