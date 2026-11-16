@@ -2,9 +2,17 @@
 
 FROM oven/bun:1.4.4
 
+# Debian's nodejs is 20.x, older than the >=24.14.0 that @openchamber/web
+# requires, so install Node from the official tarball instead.
+# renovate: datasource=node-version depName=node
+ARG NODE_VERSION=24.22.3
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash ca-certificates git nodejs npm openssh-client && \
+    bash ca-certificates curl git openssh-client && \
     rm -rf /var/lib/apt/lists/* && \
+    curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-$(uname -m | sed -e s/x86_64/x64/ -e s/aarch64/arm64/).tar.gz" | \
+        tar -xz -C /usr/local --strip-components=1 --no-same-owner && \
+    node --version && \
     userdel bun && \
     groupadd -g 1000 openchamber && \
     useradd -u 1000 -g 1000 -m -s /bin/bash openchamber
