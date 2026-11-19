@@ -1,6 +1,6 @@
 # OpenChamber - latest release (npm @openchamber/web), variant tag :latest
 
-FROM oven/bun:1.4.4
+FROM oven/bun:1.4.5
 
 # Debian's nodejs is 20.x, older than the >=24.14.0 that @openchamber/web
 # requires, so install Node from the official tarball instead.

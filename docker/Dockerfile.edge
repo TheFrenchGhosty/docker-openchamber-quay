@@ -1,6 +1,6 @@
 # OpenChamber - latest source build from upstream main, variant tag :edge
 
-FROM oven/bun:1.4.4 AS builder
+FROM oven/bun:1.4.5 AS builder
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -19,7 +19,7 @@ RUN SETTINGS_RUNTIME=packages/web/server/lib/opencode/settings-runtime.js && \
     test "$(grep -c 'if (false) await fsPromises\.chmod' "$SETTINGS_RUNTIME")" -eq 3
 
 
-FROM oven/bun:1.4.4
+FROM oven/bun:1.4.5
 
 # Debian's nodejs is 20.x, older than the >=24.14.0 that @openchamber/web
 # requires, so install Node from the official tarball instead.
